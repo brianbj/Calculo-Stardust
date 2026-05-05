@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora CUB — ZELT Imóveis</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0D1B2A;
+    --navy-mid: #162236;
+    --navy-light: #1E3050;
+    --gold: #C9A84C;
+    --gold-light: #E2C27A;
+    --gold-dim: rgba(201,168,76,0.15);
+    --white: #F5F3EF;
+    --gray: #8B96A3;
+    --red: #E05A4E;
+    --red-dim: rgba(224,90,78,0.12);
+    --red-border: rgba(224,90,78,0.3);
+    --radius: 12px;
+  }
+
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    background-image:
+      radial-gradient(ellipse 800px 600px at 50% -100px, rgba(201,168,76,0.08) 0%, transparent 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(255,255,255,0.015) 60px),
+      repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(255,255,255,0.015) 60px);
+  }
+
+  .card {
+    width: 100%;
+    max-width: 540px;
+    background: var(--navy-mid);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04) inset;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--navy-light);
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+    padding: 28px 36px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .brand-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .brand-mark { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
+  .brand-mark svg { width: 36px; height: 36px; }
+  .brand-name { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 3px; color: var(--gold); line-height: 1; }
+  .brand-sub { font-size: 10px; letter-spacing: 2px; color: var(--gray); text-transform: uppercase; line-height: 1; margin-top: 2px; }
+  .title { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 2px; color: var(--white); line-height: 1; }
+  .title span { color: var(--gold); }
+  .subtitle { font-size: 12px; color: var(--gray); margin-top: 6px; letter-spacing: 0.5px; font-weight: 300; }
+
+  /* BODY */
+  .body { padding: 28px 36px; display: flex; flex-direction: column; gap: 20px; }
+
+  /* SECTION LABELS */
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gray);
+  }
+  .section-label .line { flex: 1; height: 1px; background: rgba(255,255,255,0.07); }
+  .section-label.red { color: var(--red); }
+  .section-label.red .line { background: rgba(224,90,78,0.2); }
+
+  /* FORMULA BADGE */
+  .formula {
+    background: var(--gold-dim);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .formula-icon { font-size: 16px; flex-shrink: 0; }
+  .formula-text { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--gold-light); line-height: 1.7; }
+  .formula-text strong { color: var(--gold); font-weight: 500; }
+
+  /* ATRASO BOX */
+  .atraso-box {
+    background: var(--red-dim);
+    border: 1px solid var(--red-border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .atraso-box .formula {
+    background: rgba(224,90,78,0.08);
+    border-color: rgba(224,90,78,0.25);
+  }
+  .atraso-box .formula-text { color: rgba(224,90,78,0.85); }
+  .atraso-box .formula-text strong { color: var(--red); }
+
+  /* TWO COLS */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* FIELD */
+  .field { display: flex; flex-direction: column; gap: 7px; }
+  .field-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gray);
+  }
+  .field-label .badge {
+    display: inline-block;
+    background: rgba(201,168,76,0.18);
+    color: var(--gold);
+    font-size: 8px;
+    padding: 2px 6px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .field-label .badge.red-badge {
+    background: rgba(224,90,78,0.18);
+    color: var(--red);
+  }
+  .input-wrap { position: relative; display: flex; align-items: center; }
+  .prefix {
+    position: absolute;
+    left: 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--gray);
+    pointer-events: none;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .suffix {
+    position: absolute;
+    right: 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--gray);
+    pointer-events: none;
+  }
+  input[type="text"], input[type="number"] {
+    width: 100%;
+    background: var(--navy);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius);
+    padding: 13px 14px 13px 44px;
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--white);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -moz-appearance: textfield;
+  }
+  input.no-prefix { padding-left: 14px; }
+  input.has-suffix { padding-right: 44px; }
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  input::placeholder { color: rgba(139,150,163,0.4); font-size: 13px; font-weight: 300; }
+  input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+  }
+  input.fixed { color: var(--gray); cursor: default; font-size: 14px; }
+  input.input-red:focus {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(224,90,78,0.12);
+  }
+
+  /* DIVIDER */
+  .divider { display: flex; align-items: center; gap: 12px; }
+  .divider-line { flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+  .divider-icon {
+    width: 28px; height: 28px;
+    background: var(--navy-light);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: var(--gold);
+  }
+
+  /* RESULT TOTAL */
+  .result-total {
+    background: var(--navy);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: var(--radius);
+    padding: 0;
+    overflow: hidden;
+    transition: border-color 0.3s;
+    position: relative;
+  }
+  .result-total.has-value { border-color: var(--gold); box-shadow: 0 0 0 1px rgba(201,168,76,0.08), 0 8px 24px rgba(0,0,0,0.3); }
+  .result-total::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--gold);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .result-total.has-value::before { opacity: 1; }
+
+  .result-main {
+    padding: 18px 20px 14px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .result-main-label { font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); }
+  .result-main-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 34px;
+    font-weight: 500;
+    color: var(--gray);
+    transition: color 0.3s;
+    letter-spacing: -0.5px;
+    margin-top: 2px;
+  }
+  .result-main-value.has-value { color: var(--gold-light); }
+
+  .result-breakdown {
+    padding: 12px 20px 14px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+  }
+  .breakdown-label { color: rgba(139,150,163,0.7); }
+  .breakdown-value {
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    color: var(--gray);
+  }
+  .breakdown-value.gold { color: var(--gold-light); }
+  .breakdown-value.red-val { color: #e07a70; }
+  .breakdown-sep { height: 1px; background: rgba(255,255,255,0.05); margin: 2px 0; }
+
+  /* BTN */
+  .btn-calc {
+    width: 100%;
+    padding: 17px;
+    background: var(--gold);
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 3px;
+    color: var(--navy);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.3);
+  }
+  .btn-calc:hover { background: var(--gold-light); box-shadow: 0 6px 28px rgba(201,168,76,0.45); transform: translateY(-1px); }
+  .btn-calc:active { transform: translateY(0); }
+
+  .btn-clear {
+    width: 100%;
+    padding: 11px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    color: var(--gray);
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+    margin-top: -6px;
+  }
+  .btn-clear:hover { border-color: rgba(255,255,255,0.2); color: var(--white); }
+
+  /* FOOTER */
+  .footer {
+    padding: 16px 36px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .footer-note { font-size: 10px; color: rgba(139,150,163,0.5); letter-spacing: 0.5px; }
+  .footer-contact { font-size: 10px; color: var(--gold); letter-spacing: 0.5px; text-decoration: none; }
+
+  /* ANIMATION */
+  @keyframes pop {
+    0% { transform: scale(0.97); opacity: 0.5; }
+    60% { transform: scale(1.01); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .animate { animation: pop 0.3s ease-out; }
+
+  /* ERROR */
+  .error-msg { font-size: 10px; color: #e07070; margin-top: -12px; padding-left: 2px; display: none; }
+  .error-msg.visible { display: block; }
+
+  /* CHIP INFO */
+  .chip-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 10px;
+    color: var(--gray);
+    letter-spacing: 0.5px;
+  }
+  .chip-info.red-chip { background: var(--red-dim); border-color: var(--red-border); color: rgba(224,90,78,0.8); }
+  .chips-row { display: flex; gap: 8px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand-row">
+      <div class="brand-mark">
+        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="36" height="36" rx="6" fill="rgba(201,168,76,0.12)"/>
+          <path d="M8 10h14l-10 8h11" stroke="#C9A84C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8 22v4h20v-4" stroke="#C9A84C" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">ZELT</div>
+        <div class="brand-sub">Imóveis</div>
+      </div>
+    </div>
+    <div class="title">Calculadora <span>CUB</span></div>
+    <div class="subtitle">Atualização de parcelas · Multa e juros por atraso</div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- ── SEÇÃO CUB ── -->
+    <div class="section-label">
+      <span>Atualização CUB</span>
+      <div class="line"></div>
+    </div>
+
+    <div class="formula">
+      <div class="formula-icon">📐</div>
+      <div class="formula-text">
+        <strong>Parcela Atualizada</strong> = Parcela × (CUB Atual ÷ CUB Base)<br>
+        CUB Base de referência: <strong>R$ 3.003,02</strong>
+      </div>
+    </div>
+
+    <!-- CUB BASE FIXO -->
+    <div class="field">
+      <label class="field-label">CUB Base de Referência <span class="badge">FIXO</span></label>
+      <div class="input-wrap">
+        <span class="prefix">R$</span>
+        <input type="text" class="fixed" value="3.003,02" readonly tabindex="-1">
+      </div>
+    </div>
+
+    <!-- PARCELA CONTRATADA -->
+    <div class="field">
+      <label class="field-label" for="parcela">Valor da Parcela Contratada</label>
+      <div class="input-wrap">
+        <span class="prefix">R$</span>
+        <input type="text" id="parcela" placeholder="0,00" inputmode="decimal" autocomplete="off">
+      </div>
+      <div class="error-msg" id="err-parcela">Informe um valor válido para a parcela.</div>
+    </div>
+
+    <div class="divider">
+      <div class="divider-line"></div>
+      <div class="divider-icon">÷</div>
+      <div class="divider-line"></div>
+    </div>
+
+    <!-- CUB DO MÊS -->
+    <div class="field">
+      <label class="field-label" for="cub-mes">CUB do Mês Atual <span class="badge">PREENCHER</span></label>
+      <div class="input-wrap">
+        <span class="prefix">R$</span>
+        <input type="text" id="cub-mes" placeholder="0,00" inputmode="decimal" autocomplete="off">
+      </div>
+      <div class="error-msg" id="err-cub">Informe o CUB do mês atual.</div>
+    </div>
+
+    <!-- ── SEÇÃO ATRASO ── -->
+    <div class="section-label red">
+      <span>Encargos por Atraso</span>
+      <div class="line"></div>
+      <span style="font-size:9px;white-space:nowrap">OPCIONAL</span>
+    </div>
+
+    <div class="atraso-box">
+
+      <div class="formula">
+        <div class="formula-icon">⚠️</div>
+        <div class="formula-text">
+          <strong>Multa contratual:</strong> 2% fixo sobre parcela atualizada<br>
+          <strong>Juros:</strong> 1% a.m. proporcional por dia de atraso
+        </div>
+      </div>
+
+      <!-- CHIPS com info fixa -->
+      <div class="chips-row">
+        <span class="chip-info red-chip">🔒 Multa: 2% fixo</span>
+        <span class="chip-info red-chip">📅 Juros: 1% a.m. = 0,0333%/dia</span>
+      </div>
+
+      <!-- DIAS DE ATRASO -->
+      <div class="field">
+        <label class="field-label" for="dias-atraso">
+          Dias de Atraso
+          <span class="badge red-badge">PREENCHER</span>
+        </label>
+        <div class="input-wrap">
+          <input type="text" id="dias-atraso" class="no-prefix has-suffix" placeholder="0" inputmode="numeric" autocomplete="off">
+          <span class="suffix">dias</span>
+        </div>
+        <div class="error-msg" id="err-dias">Informe um número de dias válido.</div>
+      </div>
+
+    </div>
+
+    <!-- BOTÃO -->
+    <button class="btn-calc" onclick="calcular()">CALCULAR VALOR TOTAL</button>
+
+    <!-- RESULTADO -->
+    <div class="result-total" id="result-box">
+      <div class="result-main">
+        <div class="result-main-label">Total a Pagar</div>
+        <div class="result-main-value" id="result-value">R$ —</div>
+      </div>
+      <div class="result-breakdown" id="breakdown">
+        <div class="breakdown-row">
+          <span class="breakdown-label">Preencha os campos e clique em calcular</span>
+          <span class="breakdown-value">—</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-clear" onclick="limpar()">↺ Limpar todos os campos</button>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span class="footer-note">Índice: SINDUSCON-SC / CUB-SC</span>
+    <a class="footer-contact" href="https://www.zelt.com.br" target="_blank">www.zelt.com.br</a>
+  </div>
+
+</div>
+
+<script>
+  const CUB_BASE = 3003.02;
+  const MULTA_PCT = 0.02;       // 2% fixo
+  const JUROS_AM  = 0.01;       // 1% ao mês
+  const JUROS_DIA = JUROS_AM / 30; // proporcional diário
+
+  function parseBR(str) {
+    if (!str || str.trim() === '') return NaN;
+    let s = str.trim().replace(/\s/g, '');
+    if (s.includes(',') && s.includes('.')) {
+      s = s.replace(/\./g, '').replace(',', '.');
+    } else if (s.includes(',')) {
+      s = s.replace(',', '.');
+    }
+    return parseFloat(s);
+  }
+
+  function formatBR(val, digits = 2) {
+    return val.toLocaleString('pt-BR', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+  }
+
+  function calcular() {
+    // Clear errors
+    ['err-parcela','err-cub','err-dias'].forEach(id => document.getElementById(id).classList.remove('visible'));
+
+    const parcela  = parseBR(document.getElementById('parcela').value);
+    const cubMes   = parseBR(document.getElementById('cub-mes').value);
+    const diasRaw  = document.getElementById('dias-atraso').value.trim();
+    const dias     = diasRaw === '' ? 0 : parseInt(diasRaw, 10);
+
+    let ok = true;
+    if (isNaN(parcela) || parcela <= 0) { document.getElementById('err-parcela').classList.add('visible'); ok = false; }
+    if (isNaN(cubMes)  || cubMes  <= 0) { document.getElementById('err-cub').classList.add('visible'); ok = false; }
+    if (diasRaw !== '' && (isNaN(dias) || dias < 0)) { document.getElementById('err-dias').classList.add('visible'); ok = false; }
+    if (!ok) return;
+
+    // ── CÁLCULOS ──
+    const parcelaAtualizada = parcela * (cubMes / CUB_BASE);
+    const variacaoPct = (cubMes / CUB_BASE - 1) * 100;
+
+    let multa = 0, juros = 0, totalEncargos = 0;
+    const temAtraso = dias > 0;
+
+    if (temAtraso) {
+      multa  = parcela * MULTA_PCT;
+      juros  = parcela * JUROS_DIA * dias;
+      totalEncargos = multa + juros;
+    }
+
+    const total = parcelaAtualizada + totalEncargos;
+
+    // ── UI ──
+    const box    = document.getElementById('result-box');
+    const valEl  = document.getElementById('result-value');
+    const bkEl   = document.getElementById('breakdown');
+
+    box.classList.add('has-value');
+    valEl.classList.add('has-value');
+    valEl.classList.remove('animate');
+    void valEl.offsetWidth;
+    valEl.classList.add('animate');
+
+    valEl.textContent = 'R$ ' + formatBR(total);
+
+    const sinal = variacaoPct >= 0 ? '+' : '';
+    const jurosPctDia = (JUROS_DIA * 100);
+
+    let rows = `
+      <div class="breakdown-row">
+        <span class="breakdown-label">Parcela original contratada</span>
+        <span class="breakdown-value">R$ ${formatBR(parcela)}</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="breakdown-label">Variação CUB (${sinal}${formatBR(variacaoPct, 4)}%)</span>
+        <span class="breakdown-value ${variacaoPct >= 0 ? 'gold' : ''}">R$ ${formatBR(parcelaAtualizada)}</span>
+      </div>`;
+
+    if (temAtraso) {
+      rows += `
+      <div class="breakdown-sep"></div>
+      <div class="breakdown-row">
+        <span class="breakdown-label">Multa contratual (2% fixo)</span>
+        <span class="breakdown-value red-val">+ R$ ${formatBR(multa)}</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="breakdown-label">Juros de atraso (${dias}d × ${formatBR(jurosPctDia, 4)}%/dia)</span>
+        <span class="breakdown-value red-val">+ R$ ${formatBR(juros)}</span>
+      </div>
+      <div class="breakdown-sep"></div>
+      <div class="breakdown-row">
+        <span class="breakdown-label" style="font-weight:600;color:var(--white)">Total de encargos</span>
+        <span class="breakdown-value red-val" style="font-weight:600">R$ ${formatBR(totalEncargos)}</span>
+      </div>`;
+    } else {
+      rows += `
+      <div class="breakdown-sep"></div>
+      <div class="breakdown-row">
+        <span class="breakdown-label" style="color:var(--gray)">Sem atraso — encargos não aplicados</span>
+        <span class="breakdown-value">R$ 0,00</span>
+      </div>`;
+    }
+
+    bkEl.innerHTML = rows;
+  }
+
+  function limpar() {
+    ['parcela','cub-mes','dias-atraso'].forEach(id => document.getElementById(id).value = '');
+    ['err-parcela','err-cub','err-dias'].forEach(id => document.getElementById(id).classList.remove('visible'));
+
+    const valEl = document.getElementById('result-value');
+    valEl.textContent = 'R$ —';
+    valEl.classList.remove('has-value','animate');
+    document.getElementById('result-box').classList.remove('has-value');
+    document.getElementById('breakdown').innerHTML = `
+      <div class="breakdown-row">
+        <span class="breakdown-label">Preencha os campos e clique em calcular</span>
+        <span class="breakdown-value">—</span>
+      </div>`;
+    document.getElementById('parcela').focus();
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') calcular(); });
+
+  // Auto-format on blur
+  ['parcela','cub-mes'].forEach(id => {
+    document.getElementById(id).addEventListener('blur', function() {
+      const val = parseBR(this.value);
+      if (!isNaN(val) && val > 0) this.value = formatBR(val);
+    });
+  });
+</script>
+
+</body>
+</html>
